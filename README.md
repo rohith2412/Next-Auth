@@ -1,36 +1,96 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+Implementing GitHub authentication from NexAuth.js using Next.js stack
 
-## Getting Started
-
-First, run the development server:
-
+Start with a fresh project
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+npx create-next-app@latest
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Install Next-Auth 
+```bash
+npm i next-auth
+```
 
-You can start editing the page by modifying `app/page.js`. The page auto-updates as you edit the file.
+add a file route in the app by ``` api/auth/[...nextauth]/route.js or ts ```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+Inside ``` route.js ``` add the below code
 
-## Learn More
+``` bash
 
-To learn more about Next.js, take a look at the following resources:
+import NextAuth from 'next-auth'
+import GitHubProvider from 'next-auth/providers/github'
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+const handler =  NextAuth({
+    providers: [
+        GitHubProvider({
+          clientId: process.env.GITHUB_ID,
+          clientSecret: process.env.GITHUB_SECRET
+        })
+  ]
+})
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+export { handler as GET, handler as POST }
 
-## Deploy on Vercel
+```
+In ```page.js``` add the below code
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+```bash
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+"use client"
+import { useSession, signIn, signOut } from "next-auth/react"
+
+export default function Component() {
+  const { data: session } = useSession()
+  if(session) {
+    return <>
+      Signed in as {session.user.email} <br/>
+      <button onClick={() => signOut()}>Sign out</button>
+    </>
+  }
+  return <>
+    Not signed in <br/>
+    <button onClick={() => signIn()}>Sign in</button>
+  </>
+}
+
+```
+
+create a new file independently ```.env.local```
+
+```bash 
+GITHUB_ID=your-secret-string
+GITHUB_SECRET=your-secret-string
+
+```
+For your GitHub ID and secret go on to your GitHub profile > developer settings
+
+Next, create a ```component/SessionWrapper.js ``` and add the below code
+
+```bash
+
+"use client"
+import { SessionProvider } from "next-auth/react";
+
+const SessionWrapper = ({children}) => {
+  return (
+    <SessionProvider>{children}</SessionProvider>
+  )
+}
+
+export default SessionWrapper
+```
+
+Also, in ```layout.js``` add 
+
+```import SessionWrapper from "./component/SessionWrapper";```
+
+and 
+
+wrap body in ```<SessionWrapper>//body///</ SessionWrapper>``` 
+
+
+
+
+
+
+
+
