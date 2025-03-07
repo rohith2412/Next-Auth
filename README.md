@@ -1,4 +1,4 @@
-Implementing GitHub authentication from NexAuth.js using Next.js stack
+Implementing Google and GitHub authentication from NexAuth.js using Next.js stack
 
 Start with a fresh project
 ```bash
@@ -16,19 +16,26 @@ Inside ``` route.js ``` add the below code
 
 ``` bash
 
-import NextAuth from 'next-auth'
-import GitHubProvider from 'next-auth/providers/github'
+import NextAuth from "next-auth";
+import GitHubProvider from "next-auth/providers/github";
+import GoogleProvider from "next-auth/providers/google"
 
-const handler =  NextAuth({
-    providers: [
-        GitHubProvider({
-          clientId: process.env.GITHUB_ID,
-          clientSecret: process.env.GITHUB_SECRET
-        })
+const handler = NextAuth({
+  providers: [
+    GitHubProvider({
+      clientId: process.env.GITHUB_ID,
+      clientSecret: process.env.GITHUB_SECRET,
+    }),
+    GoogleProvider({
+      clientId: process.env.GOOGLE_CLIENT_ID,
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET
+    })
+  
   ]
-})
+});
 
-export { handler as GET, handler as POST }
+export { handler as GET, handler as POST };
+
 
 ```
 In ```page.js``` add the below code
@@ -59,9 +66,11 @@ create a new file independently ```.env.local```
 ```bash 
 GITHUB_ID=your-secret-string
 GITHUB_SECRET=your-secret-string
+GOOGLE_CLIENT_ID=your-secret-string
+GOOGLE_CLIENT_SECRET=your-secret-string
 
 ```
-For your GitHub ID and secret go on to your GitHub profile > developer settings
+For your GitHub ID and secret go on to your GitHub profile > developer settings and for Google you would have to go to the console google cloud
 
 Next, create a ```component/SessionWrapper.js ``` and add the below code
 
